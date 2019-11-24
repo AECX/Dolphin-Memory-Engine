@@ -20,6 +20,8 @@ DlgAddWatchEntry::DlgAddWatchEntry(MemWatchEntry* entry)
           &DlgAddWatchEntry::onTypeChange);
   connect(m_spnLength, QOverload<int>::of(&QSpinBox::valueChanged), this,
           &DlgAddWatchEntry::onLengthChanged);
+  connect(m_spnFlag, QOverload<int>::of(&QSpinBox::valueChanged), this,
+          &DlgAddWatchEntry::onFlagValueChanged);
 }
 
 DlgAddWatchEntry::~DlgAddWatchEntry()
@@ -61,6 +63,12 @@ void DlgAddWatchEntry::initialiseWidgets()
   m_spnLength = new QSpinBox(this);
   m_spnLength->setMinimum(1);
   m_spnLength->setMaximum(9999);
+
+  m_flagWidget = new QWidget;
+
+  m_spnFlag = new QSpinBox(this);
+  m_spnFlag->setMinimum(1);
+  m_spnFlag->setMaximum(0xFF);
 }
 
 void DlgAddWatchEntry::makeLayouts()
@@ -123,6 +131,12 @@ void DlgAddWatchEntry::makeLayouts()
   layout_length->addWidget(m_spnLength);
   m_lengtWidget->setLayout(layout_length);
 
+  QLabel* lblFlag = new QLabel(QString("Flag Value: "), this);
+  QHBoxLayout* layout_flag = new QHBoxLayout;
+  layout_flag->addWidget(lblFlag);
+  layout_flag->addWidget(m_spnFlag);
+  m_flagWidget->setLayout(layout_flag);
+
   QDialogButtonBox* buttonBox =
       new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
@@ -135,6 +149,7 @@ void DlgAddWatchEntry::makeLayouts()
   main_layout->addWidget(labelWidget);
   main_layout->addWidget(typeWidget);
   main_layout->addWidget(m_lengtWidget);
+  main_layout->addWidget(m_flagWidget);
   main_layout->addWidget(buttonBox);
   main_layout->addStretch();
   setLayout(main_layout);
@@ -151,7 +166,9 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
 
     m_cmbTypes->setCurrentIndex(0);
     m_spnLength->setValue(1);
+    m_spnFlag->setValue(1);
     m_lengtWidget->hide();
+    m_flagWidget->hide();
     m_lblValuePreview->setText("???");
     m_chkBoundToPointer->setChecked(false);
     m_pointerWidget->hide();
@@ -161,12 +178,17 @@ void DlgAddWatchEntry::fillFields(MemWatchEntry* entry)
     m_entry = entry;
 
     m_spnLength->setValue(static_cast<int>(m_entry->getLength()));
+    m_spnFlag->setValue(0xFF);
     m_cmbTypes->setCurrentIndex(static_cast<int>(m_entry->getType()));
     if (m_entry->getType() == Common::MemType::type_string ||
         m_entry->getType() == Common::MemType::type_byteArray)
       m_lengtWidget->show();
     else
       m_lengtWidget->hide();
+    if (m_entry->getType() == Common::MemType::type_flag)
+      m_flagWidget->show();
+    else
+      m_flagWidget->hide();
     m_txbLabel->setText(m_entry->getLabel());
     std::stringstream ssAddress;
     ssAddress << std::hex << std::uppercase << m_entry->getConsoleAddress();
@@ -299,7 +321,13 @@ void DlgAddWatchEntry::onTypeChange(int index)
     m_lengtWidget->show();
   else
     m_lengtWidget->hide();
-  m_entry->setTypeAndLength(theType, m_spnLength->value());
+
+  if (theType == Common::MemType::type_flag)
+    m_flagWidget->show();
+  else
+    m_flagWidget->hide();
+
+  m_entry->setTypeLengthAndFlag(theType, m_spnLength->value(), m_spnFlag->value());
   if (validateAndSetAddress())
     updatePreview();
 }
@@ -415,7 +443,15 @@ void DlgAddWatchEntry::updatePreview()
 void DlgAddWatchEntry::onLengthChanged()
 {
   Common::MemType theType = static_cast<Common::MemType>(m_cmbTypes->currentIndex());
-  m_entry->setTypeAndLength(theType, m_spnLength->value());
+  m_entry->setTypeLengthAndFlag(theType, m_spnLength->value(), m_spnFlag->value());
+  if (validateAndSetAddress())
+    updatePreview();
+}
+
+void DlgAddWatchEntry::onFlagValueChanged()
+{
+  Common::MemType theType = static_cast<Common::MemType>(m_cmbTypes->currentIndex());
+  m_entry->setTypeLengthAndFlag(theType, m_spnLength->value(), m_spnFlag->value());
   if (validateAndSetAddress())
     updatePreview();
 }

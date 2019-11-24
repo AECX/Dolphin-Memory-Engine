@@ -161,7 +161,7 @@ void MemWatchTreeNode::readFromJson(const QJsonObject& json, MemWatchTreeNode* p
     size_t length = 1;
     if (json["length"] != QJsonValue::Undefined)
       length = static_cast<size_t>(json["length"].toDouble());
-    m_entry->setTypeAndLength(static_cast<Common::MemType>(json["typeIndex"].toInt()), length);
+    m_entry->setTypeLengthAndFlag(static_cast<Common::MemType>(json["typeIndex"].toInt()), length);
     m_entry->setSignedUnsigned(json["unsigned"].toBool());
     m_entry->setBase(static_cast<Common::MemBase>(json["baseIndex"].toInt()));
     if (json["pointerOffsets"] != QJsonValue::Undefined)

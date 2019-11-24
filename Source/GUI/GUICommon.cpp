@@ -7,6 +7,7 @@ namespace GUICommon
 {
 QStringList g_memTypeNames =
     QStringList({QCoreApplication::translate("Common", "Byte"),
+				 QCoreApplication::translate("Common", "Flag"),
                  QCoreApplication::translate("Common", "2 bytes (Halfword)"),
                  QCoreApplication::translate("Common", "4 bytes (Word)"),
                  QCoreApplication::translate("Common", "Float"),
@@ -43,6 +44,7 @@ QString getStringFromType(const Common::MemType type, const size_t length)
   case Common::MemType::type_word:
   case Common::MemType::type_float:
   case Common::MemType::type_double:
+  case Common::MemType::type_flag:
     return GUICommon::g_memTypeNames.at(static_cast<int>(type));
   case Common::MemType::type_string:
     return QString::fromStdString("string[" + std::to_string(length) + "]");

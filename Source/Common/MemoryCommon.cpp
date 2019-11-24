@@ -15,6 +15,8 @@ size_t getSizeForType(const MemType type, const size_t length)
 {
   switch (type)
   {
+
+  case MemType::type_flag:
   case MemType::type_byte:
     return sizeof(u8);
   case MemType::type_halfword:
@@ -38,6 +40,7 @@ bool shouldBeBSwappedForType(const MemType type)
 {
   switch (type)
   {
+  case MemType::type_flag:
   case MemType::type_byte:
     return false;
   case MemType::type_halfword:
@@ -61,6 +64,7 @@ int getNbrBytesAlignementForType(const MemType type)
 {
   switch (type)
   {
+  case MemType::type_flag:
   case MemType::type_byte:
     return 1;
   case MemType::type_halfword:
@@ -82,9 +86,9 @@ int getNbrBytesAlignementForType(const MemType type)
 
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
                            const std::string inputString, const MemBase base, const MemType type,
-                           const size_t length)
+                           const size_t length, u8 flagValue, const char* memory)
 {
-  if (inputString.length() == 0)
+  if (inputString.length() == 0 || memory == nullptr)
   {
     returnCode = MemOperationReturnCode::invalidInput;
     return nullptr;
@@ -109,6 +113,37 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
 
   switch (type)
   {
+  case MemType::type_flag:
+  {
+    u8 theFlagByte = 0;
+
+    // MemBase doesn't matter
+
+    if (flagValue == 0)
+    {
+      returnCode = MemOperationReturnCode::invalidInput;
+      delete[] buffer;
+      buffer = nullptr;
+      return buffer;
+    }
+
+	// TODO: Lowercase comparison
+    if (0 == inputString.compare("false") || 0 == inputString.compare("False"))
+    {
+	  // Unset the bit
+      theFlagByte = static_cast<u8>(memory[0] & (~flagValue));
+    }
+    else
+    {
+      theFlagByte = static_cast<u8>(memory[0] | flagValue);
+	}
+
+    returnCode = MemOperationReturnCode::OK;
+    std::memcpy(buffer, &theFlagByte, size);
+    actualLength = sizeof(u8);
+    break;
+  }
+
   case MemType::type_byte:
   {
     u8 theByte = 0;
@@ -326,7 +361,7 @@ char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLen
 }
 
 std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
-                                 const MemBase base, const bool isUnsigned, const bool withBSwap)
+                                 const MemBase base, const bool isUnsigned, const bool withBSwap, u8 flagValue)
 {
   std::stringstream ss;
   switch (base)
@@ -344,6 +379,16 @@ std::string formatMemoryToString(const char* memory, const MemType type, const s
 
   switch (type)
   {
+  case Common::MemType::type_flag:
+  {
+    u8 byte = 0;
+    std::memcpy(&byte, memory, sizeof(u8));
+   bool flagState = (byte & flagValue) == flagValue;
+
+	return flagState ? "True" : "False";
+
+    break;
+  }
   case Common::MemType::type_byte:
   {
     if (isUnsigned || base == Common::MemBase::base_binary)

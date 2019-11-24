@@ -338,11 +338,11 @@ void MemWatchWidget::onWatchDoubleClicked(const QModelIndex& index)
     {
       MemWatchEntry* entry = node->getEntry();
       int typeIndex = static_cast<int>(entry->getType());
-      DlgChangeType* dlg = new DlgChangeType(this, typeIndex, entry->getLength());
+      DlgChangeType* dlg = new DlgChangeType(this, typeIndex, entry->getLength(), entry->getFlagValue());
       if (dlg->exec() == QDialog::Accepted)
       {
         Common::MemType theType = static_cast<Common::MemType>(dlg->getTypeIndex());
-        m_watchModel->changeType(index, theType, dlg->getLength());
+        m_watchModel->changeType(index, theType, dlg->getLength(), dlg->getFlagValue());
         m_hasUnsavedChanges = true;
       }
     }

@@ -18,13 +18,14 @@ const u32 MEM2_END = 0x94000000;
 enum class MemType
 {
   type_byte = 0,
+  type_flag,
   type_halfword,
   type_word,
   type_float,
   type_double,
   type_string,
   type_byteArray,
-  type_num
+  type_num  
 };
 
 enum class MemBase
@@ -50,8 +51,8 @@ bool shouldBeBSwappedForType(const MemType type);
 int getNbrBytesAlignementForType(const MemType type);
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
                            const std::string inputString, const MemBase base, const MemType type,
-                           const size_t length);
+                           const size_t length, u8 flagValue = 0, const char* memory = nullptr);
 std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
                                  const MemBase base, const bool isUnsigned,
-                                 const bool withBSwap = false);
+                                 const bool withBSwap = false, u8 flagValue = 0);
 } // namespace Common

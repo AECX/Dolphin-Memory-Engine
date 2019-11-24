@@ -48,7 +48,7 @@ public:
   bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column,
                     const QModelIndex& parent) override;
 
-  void changeType(const QModelIndex& index, const Common::MemType type, const size_t length);
+  void changeType(const QModelIndex& index, const Common::MemType type, const size_t length, u8 flagValue);
   MemWatchEntry* getEntryFromIndex(const QModelIndex& index) const;
   void addGroup(const QString& name);
   void addEntry(MemWatchEntry* entry);

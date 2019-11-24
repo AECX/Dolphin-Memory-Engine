@@ -22,6 +22,7 @@ public:
   void onAddressChanged();
   void onIsPointerChanged();
   void onLengthChanged();
+  void onFlagValueChanged();
   void onOffsetChanged();
   MemWatchEntry* getEntry() const;
 
@@ -46,9 +47,11 @@ private:
   QLabel* m_lblValuePreview;
   QLineEdit* m_txbLabel;
   QComboBox* m_cmbTypes;
+  QSpinBox* m_spnFlag;
   QSpinBox* m_spnLength;
   QWidget* m_lengtWidget;
   QWidget* m_pointerWidget;
+  QWidget* m_flagWidget;
   QPushButton* m_btnAddOffset;
   QPushButton* m_btnRemoveOffset;
 };

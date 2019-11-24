@@ -15,7 +15,8 @@ public:
   MemWatchEntry(const QString label, const u32 consoleAddress, const Common::MemType type,
                 const Common::MemBase = Common::MemBase::base_decimal,
                 const bool m_isUnsigned = false, const size_t length = 1,
-                const bool isBoundToPointer = false);
+                const bool isBoundToPointer = false,
+				u8 flagValue = 0);
   MemWatchEntry(MemWatchEntry* entry);
   ~MemWatchEntry();
 
@@ -26,6 +27,7 @@ public:
   bool isBoundToPointer() const;
   Common::MemBase getBase() const;
   size_t getLength() const;
+  u8 getFlagValue() const;
   char* getMemory() const;
   bool isUnsigned() const;
   int getPointerOffset(const int index) const;
@@ -33,7 +35,7 @@ public:
   size_t getPointerLevel() const;
   void setLabel(const QString& label);
   void setConsoleAddress(const u32 address);
-  void setTypeAndLength(const Common::MemType type, const size_t length = 1);
+  void setTypeLengthAndFlag(const Common::MemType type, const size_t length = 1, u8 flagValue = 0);
   void setBase(const Common::MemBase base);
   void setLock(const bool doLock);
   void setSignedUnsigned(const bool isUnsigned);
@@ -67,4 +69,5 @@ private:
   char* m_freezeMemory = nullptr;
   size_t m_freezeMemSize = 0;
   size_t m_length = 1;
+  u8 m_flagValue = 0xFF;
 };
